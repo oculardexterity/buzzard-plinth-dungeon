@@ -91,8 +91,11 @@ class Client(Actor):
         try:
             name = args[0].lower().capitalize()
             person_to_die = clients.get_client({"name": name}, include_bots=True)
-            print(person_to_die)
-            if person_to_die.alive:
+            
+            if person_to_die == self:
+                msg = "You can't kill yourself."
+
+            elif person_to_die.alive:
                 msg = "You killed {}. That's mean.".format(person_to_die.name)
                 person_to_die.get_killed_by(self.name)
             else:
@@ -102,3 +105,17 @@ class Client(Actor):
             msg = "There's no such person as {} in the dungeon.".format(name)
         self.admin_message(msg)
 
+    def command_resuscitate(self, args, clients=None):
+        try:
+            name = args[0].lower().capitalize()
+
+            subject = clients.get_client({"name": name}, include_bots=True)
+            if subject.alive:
+                msg = "{} is alive already".format(subject.name)
+            else:
+                msg = "You've brought {} back to life. What a blessing.".format(subject.name)
+                subject.get_resuscitated_by(self.name)
+        except Exception as e:
+            print(e)
+            msg = "There's no such person as {} in the dungeon.".format(name)
+        self.admin_message(msg)

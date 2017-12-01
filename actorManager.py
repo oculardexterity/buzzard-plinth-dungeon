@@ -36,16 +36,22 @@ class ActorManager:
     def filter_clients(self, filters, include_bots=False):
         # new implemenation
         # should take a list of tuples or a dict
+
+        # Some type fixing and normalisation to tuple list
         assert isinstance(filters, (dict, list))
         if isinstance(filters, list):
             for item in list:
                 assert isinstance(item, list)
-
         if isinstance(filters, dict):
             filters = [(k, v) for k, v in filters.items()]
+
+        # Filter out bots if not desired
         if not include_bots:
             filters.append(('type', 'Client'))
+        # Check actor has a name set (means logged in properly)
+        filters.append(('name', True))
 
+        # Main logic of filter matching
         actor_list = []
         for actor in self:
             accept = True
@@ -60,9 +66,7 @@ class ActorManager:
                         break
             if accept:
                 actor_list.append(actor)
-
         return actor_list
-
 
     def exists_already(self, filters, include_bots=False):
         return len(self.filter_clients(filters, include_bots=include_bots)) > 0

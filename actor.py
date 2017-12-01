@@ -45,3 +45,8 @@ class Actor:
         msg = "You were killed by {}! (The bastard)".format(killer)
         self.admin_message(msg)
         self.alive = False
+
+    def get_resuscitated_by(self, resuscitator):
+        msg = "You were resuscitated by {}! (Back to the dungeon!)".format(resuscitator)
+        self.admin_message(msg)
+        self.alive = True
