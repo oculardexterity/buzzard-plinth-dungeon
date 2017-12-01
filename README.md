@@ -1,0 +1,62 @@
+# Buzzard-Plinth-Dungeon*
+
+A pointless project I'm working on to learn about asynchronous Python.
+
+At the moment it's a dungeon-cum-chatroom, where you can arbitrarily kill people.
+Connect via command-line telnet connection.
+
+## Running
+
+You need __Python 3.6__ installed.
+There aren't any requirements to install with pip at the moment.
+
+Just run:
+	
+	$ python3 run.py
+
+Then fire up telnet:
+
+	$ telnet 127.0.0.1 51234
+
+(or whatever IP address it is)
+
+	$ telnet 127.0.0.1 51234
+	Trying 127.0.0.1...
+	Connected to localhost.
+	Escape character is '^]'.
+	DUNGEON ADMIN: Welcome. Please type your name:
+
+Then type your name and press Enter to log in.
+
+	DUNGEON ADMIN: Hello John!
+	DUNGEON ADMIN: You are all alone in the dungeon at the moment. (HAHAHA)
+
+## Some commands
+
+Once connected, you will be asked to enter your name.
+
+Then, just type to chat, as if this were a normal chatroom.
+
+Commands are preceded by an exclamation mark(!), e.g.:
+
+	!jump
+
+	DUNGEON ADMIN: You jumped ! (Not sure why.)
+
+Some commands support arguments. Read the source code.
+
+	!jump really fucking high in the sky
+
+	DUNGEON ADMIN: You jumped really fucking high in the sky! (Not sure why.)
+
+## Future developments...
+
+### Proper development stuff
+- rename a whole bunch of classes to be more sane
+
+### Random features
+- multiple rooms
+- objects
+- more stuff to do
+- bots
+- buzzards and plinths
