@@ -14,7 +14,7 @@ Just run:
 	
 	$ python3 run.py
 
-Then fire up telnet:
+Then fire up telnet in another Terminal window:
 
 	$ telnet 127.0.0.1 51234
 
@@ -30,6 +30,8 @@ Then type your name and press Enter to log in.
 
 	DUNGEON ADMIN: Hello John!
 	DUNGEON ADMIN: You are all alone in the dungeon at the moment. (HAHAHA)
+
+Then get all your mates to connect, as a chatroom with optional killing is a bit pointless otherwise.
 
 ## Some commands
 
@@ -60,3 +62,5 @@ Some commands support arguments. Read the source code.
 - more stuff to do
 - bots
 - buzzards and plinths
+
+ *  The buzzard-plinth business is because I made an earlier version of this in JavaScript with only one person and the optional task of putting a buzzard on a plinth in the shortest space of time. (The trick was to move the plinth to the buzzard.)
