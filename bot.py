@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import random
 import time
 
 from actor import Actor
@@ -37,10 +38,18 @@ class Bot(Actor):
 class ArseBot(Bot):
     async def do_task(self):
         t = self.get_time()
-        self.clients.broadcast_message(self, "ARSE AT " + t)
+        self.clients.broadcast_message(self, "This is your {} arse: ARSE!".format(t))
 
 
 class NiceBot(Bot):
     async def do_task(self):
-        for name in [client.name for client in self.clients if client.has_name() and client.name != self.name]:
-            self.clients.broadcast_message(self, "Hello {}!".format(name))
+        print('NiceBot Running')
+        MESSAGES = ["My oh my, {}! You're looking lovely today!",
+                    "{} is truly marvellous.",
+                    "{}! I don't know when I've met a wittier fellow!",
+                    "There's no one more charming than {}!",
+                    "It's a brighter day for having {} in this dungeon!"]
+                    
+        c_names = [client.name for client in self.clients if client != self]
+        message = random.choice(MESSAGES).format(random.choice(c_names))
+        self.clients.broadcast_message(self, message, exclude=[self])
