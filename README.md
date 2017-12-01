@@ -5,6 +5,10 @@ A pointless project I'm working on to learn about asynchronous Python.
 At the moment it's a dungeon-cum-chatroom, where you can arbitrarily kill people.
 Connect via command-line telnet connection.
 
+## Updates
+- There are now two bots.
+
+
 ## Running
 
 You need __Python 3.6__ installed.
