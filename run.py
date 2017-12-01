@@ -5,9 +5,9 @@ import logging
 import concurrent.futures
 import pprint
 import re
-import time
 
-from clientManager import ClientManager
+
+from actorManager import ActorManager
 from client import Client
 from bot import ArseBot, NiceBot
 
@@ -16,15 +16,13 @@ log = logging.getLogger(__name__)
 pp = pprint.PrettyPrinter(indent=4)
 
 
-
 class ConnectionHandler:
     def __init__(self):
-        self.clients = ClientManager()
-        
+        self.clients = ActorManager()
 
     async def manage_bots(self):
         bots = [ArseBot('Arsebot', 15, self.clients),
-                NiceBot('NiceBot', 20, self.clients)]
+                NiceBot('Nicebot', 20, self.clients)]
 
         loop = asyncio.get_event_loop()
 
@@ -76,7 +74,7 @@ class ConnectionHandler:
 
                             log.info("Client '{}' sent message: '{}'".format(client.name, message))
 
-                            exclude = self.clients.filter_clients(("alive", False)) + [client]
+                            exclude = self.clients.filter_clients({"alive": False}) + [client]
                             self.clients.broadcast_message(client, message, exclude=exclude)
                 
                 else:
@@ -110,14 +108,14 @@ class ConnectionHandler:
 
 
     def handle_client_naming(self, client, message):
-        if self.clients.exists_already(("name", message)):
+        if self.clients.exists_already({"name": message}, include_bots=True):
             print("client {} already exists".format(message))
             client.admin_message('That name is already taken. Try again.', prompt=True)
         else:    
             client.set_name_and_greet(message)
             msg = "{} has joined the conversation".format(client.name)
             self.clients.broadcast_admin_message(msg, exclude=[client], prompt=True)
-            if self.clients.more_than_one():
+            if self.clients.more_than_one(include_bots=True):
                 c_names = [client.name for client in self.clients]
                 msg = "People currently in the dungeon are: " + ", ".join(c_names)
                 client.admin_message(msg, prompt=True)

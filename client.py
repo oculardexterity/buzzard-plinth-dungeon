@@ -1,51 +1,10 @@
 import logging
 
+from actor import Actor
+
+
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
-
-
-class Actor:
-    def __init__(self, actor_name, actor_type, actor_location):
-        self.name = actor_name
-        self.type = actor_type
-        self.location = actor_location
-        self.alive = True
-
-    def __getitem__(self, item):
-        return self.__dict__[item]
-
-    def has_name(self):
-        return self.name != ""
-
-    # Generic versions of action methods
-    # to be implemented for Client and Bot classes
-
-    # Uses 'pass' so we don't have to worry about being accidentally called on a bot
-
-    def send_message(self, message, prompt=False):
-        """
-        Base function overwritten by Client.
-        So let's just log it shall we.
-        """
-        log_message = "Message sent to {}: '{}'".format(self.name, message)
-        log.info(log_message)
-
-    # Not actually used.
-    def broadcast_message(self, message):
-        pass
-
-    def admin_message(self, message):
-        pass
-
-
-
-    def get_killed_by(self, killer):
-        msg = "You were killed by {}! (The bastard)".format(killer)
-        self.admin_message(msg)
-        self.alive = False
-
-
-
 
 
 class Client(Actor):
@@ -131,7 +90,7 @@ class Client(Actor):
     def command_kill(self, args, clients=None):
         try:
             name = args[0].lower().capitalize()
-            person_to_die = clients.get_client(("name", name), bots=True)
+            person_to_die = clients.get_client({"name": name}, include_bots=True)
             print(person_to_die)
             if person_to_die.alive:
                 msg = "You killed {}. That's mean.".format(person_to_die.name)
