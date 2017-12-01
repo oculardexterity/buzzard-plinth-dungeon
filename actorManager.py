@@ -36,29 +36,28 @@ class ActorManager:
     def filter_clients(self, filters, include_bots=False):
         # new implemenation
         # should take a list of tuples or a dict
-        assert isinstance(filters, (dict, tuple))
+        assert isinstance(filters, (dict, list))
+        if isinstance(filters, list):
+            for item in list:
+                assert isinstance(item, list)
+
         if isinstance(filters, dict):
             filters = [(k, v) for k, v in filters.items()]
         if not include_bots:
             filters.append(('type', 'Client'))
 
-        print(filters)
         actor_list = []
         for actor in self:
             accept = True
-            #print(actor.name)
             for key, value in filters:
                 if isinstance(value, bool):
                     if bool(actor.__dict__[key]) != value:
                         accept = False
                         break
                 else:
-                    #print("COMPARED VALUES:", actor.__dict__[key], value, actor.__dict__[key] == value)
                     if actor.__dict__[key] != value:
-                        #print("RESULT: not equal")
                         accept = False
                         break
-            #print('accept:', accept)
             if accept:
                 actor_list.append(actor)
 
