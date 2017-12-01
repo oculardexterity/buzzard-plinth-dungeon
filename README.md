@@ -39,7 +39,7 @@ Once connected, you will be asked to enter your name.
 
 Then, just type to chat, as if this were a normal chatroom.
 
-Commands are preceded by an exclamation mark(!), e.g.:
+Commands are preceded by an exclamation mark(!) — because RiscOS executables used ! in the same way — e.g. :
 
 	!jump
 
