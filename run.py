@@ -5,10 +5,12 @@ import logging
 import concurrent.futures
 import pprint
 import re
+import time
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 pp = pprint.PrettyPrinter(indent=4)
+
 
 
 class ClientManager:
@@ -40,26 +42,41 @@ class ClientManager:
             if client not in exclude:
                 client.admin_message(message, prompt=prompt)
 
-    def filter_clients(self, filt):
+    def filter_clients(self, filt, bots=False):
         if isinstance(filt, tuple):
             key, value = filt
-            return [client for client in self\
-                    if client[key] == value]
+
+            clients_list = []
+            for client in self:
+                print(key, value)
+                print(client.type, client['name'], client[key] == value)
+                if client.type == "Bot" and bots and client[key] == value:
+                    print('got bot')
+                    clients_list.append(client)
+                elif client[key] == value:
+                    clients_list.append(client)
+            return clients_list
+          
+
+
+
+
+
         if isinstance(filt, str):
             return [client for client in self\
-                    if bool(client[filt])]
+                    if (client.type == "Bot" and bots) or bool(client[filt])]
         raise TypeError("Requires a tuple or a string as input.")
 
-    def exists_already(self, filt):
-        return len(self.filter_clients(filt)) > 0
+    def exists_already(self, filt, bots=False):
+        return len(self.filter_clients(filt, bots=bots)) > 0
 
-    def get_client(self, filt):
-        clients = self.filter_clients(filt)
+    def get_client(self, filt, bots=False):
+        clients = self.filter_clients(filt, bots=bots)
+        print(clients)
         if len(clients) == 1:
             return clients[0]
         else:
             return None
-
 
     """
     Return info for commands carried out by others
@@ -79,6 +96,7 @@ class Client:
         self.name = ""
         self.location = 0
         self.alive = True
+        self.type = "Client"
 
         # Send message asking for name:
 
@@ -136,13 +154,16 @@ class Client:
     def command_kill(self, args, clients=None):
         try:
             name = args[0].lower().capitalize()
-            person_to_die = clients.get_client(("name", name))
+            
+            person_to_die = clients.get_client(("name", name), bots=True)
+            print(person_to_die)
             if person_to_die.alive:
                 msg = "You killed {}. That's mean.".format(person_to_die.name)
                 person_to_die.get_killed_by(self.name)
             else:
                 msg = "{} is already dead.".format(person_to_die.name)
-        except Exception:
+        except Exception as e:
+            print(e)
             msg = "There's no such person as {} in the dungeon.".format(name)
         self.admin_message(msg)
 
@@ -152,22 +173,87 @@ class Client:
         self.alive = False
 
 
+class Bot:
+    def __init__(self, name, timeout, clients):
+        self.name = name
+        self.timeout = timeout
+        self.clients = clients
+        self.type = "Bot"
+        self.alive = True
+
+    def __getitem__(self, item):
+        if item in self.__dict__:
+            return item
+
+    def has_name(self):
+        return True
+
+    def send_message(self, message, prompt=False):
+        pass
+
+    def admin_message(self, message, prompt=False):
+        pass
+
+    async def bot_loop(self):
+        while True:
+            await asyncio.sleep(self.timeout)
+            await self.do_task()
+
+    async def do_task(self):
+        raise NotImplementedError
+
+    def get_killed_by(self, killer):
+        #msg = "You were killed by {}! (The bastard)".format(killer)
+        #self.admin_message(msg)
+        self.alive = False
+        print("bot is dead")
+
+class ArseBot(Bot):
+    async def do_task(self):
+        t = time.strftime("%H:%M:%S", time.gmtime())
+        self.clients.broadcast_message(self, "ARSE AT " + t)
+
+class NiceBot(Bot):
+    async def do_task(self):
+        t = time.strftime("%H:%M:%S", time.gmtime())
+        
+        for name in [client.name for client in self.clients if client.has_name()]:
+            self.clients.broadcast_message(self, "Hello {}!".format(name))
 
 
 class ConnectionHandler:
     def __init__(self):
         self.clients = ClientManager()
+        
+
+    async def manage_bots(self):
+        bots = [ArseBot('Arsebot', 15, self.clients),
+                NiceBot('NiceBot', 20, self.clients)]
+
+        loop = asyncio.get_event_loop()
+
+        for bot in bots:
+            self.clients.add_client(bot.name, bot)
+            loop.create_task(bot.bot_loop())
+            
+
+
+            #await asyncio.sleep(10)
+            
+            #self.clients.broadcast_admin_message('Confirm bots running at {}'.format(t), prompt=True)
+
 
     async def __call__(self, reader, writer):
-        self.clients.add_client(writer, Client(writer))
 
+        self.clients.add_client(writer, Client(writer))
         client = self.clients(writer)
         client.ask_name()
 
         log.info('Accepted connection from {}'.format(client.peername))
-       
+        
 
         while True:
+
             try:
                 _bytes = await reader.readline()
                 if _bytes:
@@ -217,9 +303,10 @@ class ConnectionHandler:
 
         message_as_list = message.replace("!", "").lower().split()
         command, args = message_as_list[0], message_as_list[1:]
-        log.info("{} tried command '{}' with args [{}]".format(client.name, command, " ,".join(args)))
+        log_msg = "{} tried command '{}' with args [{}]".format(client.name, command, ", ".join(args))
         try:
             getattr(client, "command_" + command)(args, clients=self.clients)
+            log_msg += ": ✅" 
             try:
                 getattr(self.clients, "info_" + command)(client, args)
             except AttributeError:
@@ -227,7 +314,8 @@ class ConnectionHandler:
         except AttributeError:
             msg = '"{}" is not a fucking command. (YET!)'.format(command.capitalize())
             client.admin_message(msg, prompt=True)
-
+            log_msg += ": ❌"
+        log.info(log_msg)
 
 
     def handle_client_naming(self, client, message):
@@ -247,6 +335,12 @@ class ConnectionHandler:
                 client.admin_message(msg, prompt=True)
 
 
+
+
+
+
+
+
 class ChatServer:
     def __init__(self, host, port, handler):
         """
@@ -261,6 +355,7 @@ class ChatServer:
         server_coroutine = asyncio.start_server(
             self.handler, host=self.host, port=self.port, loop=loop)
         server = loop.run_until_complete(server_coroutine)
+        loop.create_task(self.handler.manage_bots())
         log.info('Listening established on {0}'.format(
             server.sockets[0].getsockname()))
         try:
