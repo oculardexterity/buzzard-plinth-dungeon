@@ -38,7 +38,8 @@ class Bot(Actor):
 class ArseBot(Bot):
     async def do_task(self):
         t = self.get_time()
-        self.clients.broadcast_message(self, "This is your {} arse: ARSE!".format(t))
+        message = "This is your {} arse: ARSE!"
+        self.clients.broadcast_message(self, message.format(t))
 
 
 class NiceBot(Bot):
@@ -49,7 +50,7 @@ class NiceBot(Bot):
                     "{}! I don't know when I've met a wittier fellow!",
                     "There's no one more charming than {}!",
                     "It's a brighter day for having {} in this dungeon!"]
-                    
+
         c_names = [client.name for client in self.clients if client != self]
         message = random.choice(MESSAGES).format(random.choice(c_names))
         self.clients.broadcast_message(self, message, exclude=[self])
