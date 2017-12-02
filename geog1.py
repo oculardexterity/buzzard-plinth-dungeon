@@ -78,10 +78,10 @@ class testplayer:
         self.location = 0
         self.orientation = "n"
 
-    def mylocation(self):
+    def command_mylocation(self):
         print(Geography.location_desc(self.location))
 
-    def compass(self):
+    def command_compass(self):
         orient = Geography.direction_name(self.orientation)
         print("You are facing {}".format(orient))
 
@@ -89,12 +89,9 @@ class testplayer:
         self.orientation = Geography.resolve_direction(self.orientation, turn)
         print(self.compass())
 
-    def move(self, arg1):
-        try:
-            if arg1 == "forward":
-                self._move_forward()
-        except Exception as e:
-            print("Move failed: ", e)
+    def command_move(self, arg1):
+        if arg1 == "forward":
+            self._move_forward()
 
     def _move_forward(self):
         destination = Geography.get_direction(self.location, self.orientation)
