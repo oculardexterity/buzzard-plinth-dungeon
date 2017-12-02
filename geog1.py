@@ -69,11 +69,17 @@ class Geography:
         compass = {"n": "North", "w": "West", "e": "East", "s": "South"}
         return compass[direction]
 
+    @classmethod
+    def location_desc(cls, location):
+        return cls.GEOGRAPHY[location].desc
 
 class testplayer:
     def __init__(self):
         self.location = 0
         self.orientation = "n"
+
+    def mylocation(self):
+        print(Geography.location_desc(self.location))
 
     def compass(self):
         orient = Geography.direction_name(self.orientation)
@@ -83,7 +89,14 @@ class testplayer:
         self.orientation = Geography.resolve_direction(self.orientation, turn)
         print(self.compass())
 
-    def move_forward(self):
+    def move(self, arg1):
+        try:
+            if arg1 == "forward":
+                self._move_forward()
+        except Exception as e:
+            print("Move failed: ", e)
+
+    def _move_forward(self):
         destination = Geography.get_direction(self.location, self.orientation)
         success, message = destination.move_into()
         if success:
