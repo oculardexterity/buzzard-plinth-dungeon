@@ -10,11 +10,11 @@ log = logging.getLogger(__name__)
 
 
 class Bot(Actor):
-    def __init__(self, bot_name, bot_timeout, client_manager):
+    def __init__(self, bot_name, bot_timeout, bot_location, client_manager=[]):
         self.timeout = bot_timeout
         self.clients = client_manager
         self.alive = True
-        super().__init__(bot_name, "Bot", 0)
+        super().__init__(bot_name, "Bot", bot_location, client_manager=client_manager)
 
     def has_name(self):
         return True
@@ -37,20 +37,22 @@ class Bot(Actor):
 
 class ArseBot(Bot):
     async def do_task(self):
+        print("Arsebot running TASK")
         t = self.get_time()
         message = "This is your {} arse: ARSE!"
-        self.clients.broadcast_message(self, message.format(t))
+        self.clients.broadcast_to_room(self, message.format(t), exclude=[self])
 
 
 class NiceBot(Bot):
     async def do_task(self):
-        print('NiceBot Running')
+        print('NiceBot Running TASK')
         MESSAGES = ["My oh my, {}! You're looking lovely today!",
                     "{} is truly marvellous.",
                     "{}! I don't know when I've met a wittier fellow!",
                     "There's no one more charming than {}!",
-                    "It's a brighter day for having {} in this dungeon!"]
+                    "It's a brighter day for having {} in these dungeons!"]
 
-        c_names = [client.name for client in self.clients if client != self]
-        message = random.choice(MESSAGES).format(random.choice(c_names))
-        self.clients.broadcast_message(self, message, exclude=[self])
+        c_names = [client.name for client in self.clients.filter_clients({"location": self.location}, include_bots=True) if client != self]
+        if c_names:
+            message = random.choice(MESSAGES).format(random.choice(c_names))
+            self.clients.broadcast_to_room(self, message, exclude=[self])

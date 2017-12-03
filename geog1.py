@@ -18,8 +18,9 @@ class Obstruction(Direction):
 
 
 class Wall(Obstruction):
-    def __init__(self):
-        false_message = "That's a wall, you idiot."
+    def __init__(self, false_message=""):
+        default_false_message = "That's a wall, you idiot."
+        false_message = false_message or default_false_message
         super().__init__(false_message)
 
 
@@ -44,9 +45,12 @@ class Room(Direction):
 class Geography:
     GEOGRAPHY = {
         0: Room(0, "Lobby", n=1, e=Wall(), s=Wall(), w=Wall()),
-        1: Room(1, "Dungeon", n=Wall(), e=2, s=0, w=Wall()),
-        2: Room(2, "Second Dungeon", n=Wall(), e=Wall(), s=Wall(), w= Wall()),
+        1: Room(1, "First Dungeon", n=Wall(), e=2, s=0, w=Wall()),
+        2: Room(2, "Second Dungeon", n=Wall(), e=Wall(), s=Wall(), w=Wall('Whoops the door has disappeared?')),
     }
+
+
+
 
     @classmethod
     def get_direction(cls, location, direction):

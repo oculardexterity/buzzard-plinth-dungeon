@@ -28,6 +28,17 @@ class ActorManager:
             if client not in exclude:
                 client.send_message(sender.name + ": " + message + "\n", prompt=prompt)
 
+    def broadcast_to_room(self, sender, message, exclude=[], prompt=False):
+
+        for client in self.filter_clients({'location': sender.location}, include_bots=True):
+            if client not in exclude:
+                client.send_message(sender.name + ": " + message + "\n", prompt=True)
+
+    def broadcast_admin_to_room(self, room, message, exclude=[], prompt=False):
+        for client in self.filter_clients({'location': room}, include_bots=True):
+            if client not in exclude:
+                client.admin_message(message, prompt=prompt)
+
     def broadcast_admin_message(self, message, exclude=[], prompt=False):
         for client in self:
             if client not in exclude:

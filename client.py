@@ -8,11 +8,11 @@ log = logging.getLogger(__name__)
 
 
 class Client(Actor):
-    def __init__(self, output_writer):
+    def __init__(self, output_writer, client_manager=[]):
         self.writer = output_writer
         self.peername = output_writer.get_extra_info('peername')
         
-        super().__init__("", 'Client', 0)
+        super().__init__("", 'Client', 0, client_manager=client_manager)
 
    
     
@@ -73,24 +73,24 @@ class Client(Actor):
     Hereafter are actual dispatchable commands.
     """
 
-    def command_jump(self, args, clients=[]):
+    def command_jump(self, args):
         self.admin_message("You jumped{}! (Not sure why.)".format(" " + " ".join(args)), prompt=True)
 
-    def command_die(self, args, clients=[]):
+    def command_die(self, args):
         self.alive = False
         self.admin_message("You died", prompt=True)
 
-    def command_autorevive(self, args, clients=[]):
+    def command_autorevive(self, args):
         if self.alive:
             self.admin_message("Not sure what death you plan to revive yourself from...")
         else:
             self.alive = True
             self.admin_message("By the miracles of science you're brought back to life")
 
-    def command_kill(self, args, clients=None):
+    def command_kill(self, args):
         try:
             name = args[0].lower().capitalize()
-            person_to_die = clients.get_client({"name": name}, include_bots=True)
+            person_to_die = self.clients.get_client({"name": name, "location": self.location}, include_bots=True)
             
             if person_to_die == self:
                 msg = "You can't kill yourself."
@@ -102,14 +102,14 @@ class Client(Actor):
                 msg = "{} is already dead.".format(person_to_die.name)
         except Exception as e:
             print(e)
-            msg = "There's no such person as {} in the dungeon.".format(name)
+            msg = "There's no such person as {} in this dungeon.".format(name)
         self.admin_message(msg)
 
-    def command_resuscitate(self, args, clients=None):
+    def command_resuscitate(self, args):
         try:
             name = args[0].lower().capitalize()
 
-            subject = clients.get_client({"name": name}, include_bots=True)
+            subject = self.clients.get_client({"name": name, "location": self.location}, include_bots=True)
             if subject.alive:
                 msg = "{} is alive already".format(subject.name)
             else:
@@ -119,3 +119,8 @@ class Client(Actor):
             print(e)
             msg = "There's no such person as {} in the dungeon.".format(name)
         self.admin_message(msg)
+
+    def command_describe(self, args):
+        assert args[0] == "here"
+
+        self.send_message(self.others_in_room_message())
