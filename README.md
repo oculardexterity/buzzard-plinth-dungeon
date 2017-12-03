@@ -6,20 +6,29 @@ At the moment it's a dungeon-cum-chatroom, where you can arbitrarily kill people
 Connect via command-line telnet connection.
 
 ## Updates
-There is geography! Move around like this:
+There is geography! Do stuff like this:
 
+	!mylocation
+	DUNGEON ADMIN: You are currently in "Lobby"
+	!describe here
+	This dungeon is empty apart from you.
 	!move forward
 	!turn left
+	!turn left
 	!move forward
-	etc.
+	DUNGEON ADMIN: You entered Lobby.
+	DUNGEON ADMIN: This dungeon is empty apart from you.
+	
 
 You can bump people off
 
 	!kill Tony
+	DUNGEON ADMIN: You killed Tony. That's mean.
 
 And revive them:
 
 	!resuscitate Tony
+	DUNGEON ADMIN: You've brought Tony back to life. What a blessing.	
 
 - There are now two bots. (You will have to find where they are.)
 
