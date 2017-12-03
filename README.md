@@ -6,8 +6,22 @@ At the moment it's a dungeon-cum-chatroom, where you can arbitrarily kill people
 Connect via command-line telnet connection.
 
 ## Updates
-- There are now two bots.
+- There is geography! Move around like this:
 
+	!move forward
+	!turn left
+	!move forward
+	etc.
+
+- You can bump people off
+
+	!kill Tony
+
+And revive them:
+
+	!resuscitate Tony
+
+- There are now two bots. (You will have to find where they are.)
 
 ## Running
 
