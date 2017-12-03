@@ -6,14 +6,14 @@ At the moment it's a dungeon-cum-chatroom, where you can arbitrarily kill people
 Connect via command-line telnet connection.
 
 ## Updates
-- There is geography! Move around like this:
+There is geography! Move around like this:
 
 	!move forward
 	!turn left
 	!move forward
 	etc.
 
-- You can bump people off
+You can bump people off
 
 	!kill Tony
 
